@@ -9,6 +9,6 @@ time `make qemu_cmd` `make qemu_config_flags` \
              -drive file=kernel/build/kernel.img,index=0,media=disk,format=raw \
              -drive file=$1.data,index=1,media=disk,format=raw \
              -device usb-ehci,id=ehci \
-             -device usb-mouse,bus=ehci.0 \
-             -device usb-kbd,bus=ehci.0 \
+             -device usb-mouse,bus=ehci.0,port=1 \
+             -device usb-kbd,bus=ehci.0,port=2 \
              -device isa-debug-exit,iobase=0xf4,iosize=0x04 || true
