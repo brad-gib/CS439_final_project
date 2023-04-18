@@ -1,6 +1,6 @@
 #include "ps2.h"
 #include "stdint.h"
-#include "config.cc"
+#include "config.h"
 #include "idt.h"
 #include "debug.h"
 #include "threads.h"
@@ -16,8 +16,8 @@
 
 void PS2::init(void) {
     //determine if ps/2 controller exists
-    RSD* rsdp = findRSD();
-    uint32_t acpi_version = rsdp->Revision == 0 ? 1 : 2;
-    char* name;
-    SDT* rsdt = findSDT(rsdp, name);
+    //RSD* rsdp = findRSD();
+    //uint32_t acpi_version = rsdp->Revision == 0 ? 1 : 2;
+    //char* name;
+    //SDT* rsdt = findSDT(rsdp, name);
 }
