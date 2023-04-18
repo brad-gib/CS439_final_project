@@ -13,11 +13,3 @@
 // #include "heap.h"
 // #include "shared.h"
 // #include "kernel.h"
-
-void PS2::init(void) {
-    //determine if ps/2 controller exists
-    RSD* rsdp = findRSD();
-    uint32_t acpi_version = rsdp->Revision == 0 ? 1 : 2;
-    char* name;
-    SDT* rsdt = findSDT(rsdp, name);
-}
