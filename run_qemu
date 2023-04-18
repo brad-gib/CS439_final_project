@@ -5,7 +5,8 @@ UTCS_OPT=-O3 make clean the_kernel $1.data
 time `make qemu_cmd` `make qemu_config_flags` \
              -no-reboot \
              -vga std \
-             -vnc :0 \
+             -vnc :3 \
+             -serial stdio \
              --monitor none \
              -drive file=kernel/build/kernel.img,index=0,media=disk,format=raw \
              -drive file=$1.data,index=1,media=disk,format=raw \

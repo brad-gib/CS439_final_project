@@ -17,7 +17,7 @@
 class PS2Controller {
 
 private:
-    unsigned short port;
+    unsigned short port;  //the port that 
     int status;
     int output;
 
@@ -37,9 +37,9 @@ public:
 
     int readByte() {
         unsigned char byte;
-        while ((inb(port + 1) & 1) == 0) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
+        // while ((inb(port + 1) & 1) == 0) {
+        //     std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        // }
         byte = inb(port);
         if (byte == 0xFA) {
             return -1; // ACK
