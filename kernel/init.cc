@@ -122,11 +122,7 @@ extern "C" void kernelInit(void) {
 
         VGA vga;
         vga.SetMode(320, 200, 8);
-        for(uint8_t y = 0; y < 200; y++) {
-            for(uint8_t x = 0; x < 320; x++) {
-                vga.PutPixel(x, y, 0xFF, 0xFF, 0xFF);
-            }
-        }
+        vga.FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
 
         /* initialize the thread module */
         threadsInit();
