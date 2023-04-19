@@ -63,7 +63,7 @@ class VGA {
 
         virtual bool SetMode(uint32_t width, uint32_t height, uint32_t colordepth);
         virtual bool SupportsMode(uint32_t width, uint32_t height, uint32_t colordepth);
-        virtual void PutPixel(uint32_t x, uint32_t y, uint8_t colorIndex);
+        virtual void updatePixel(uint32_t x, uint32_t y, uint8_t colorIndex);
         virtual void PutPixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b); // 24 bit color code (r, g, b)
         virtual void FillRectangle(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t r, uint8_t g, uint8_t b);
 };

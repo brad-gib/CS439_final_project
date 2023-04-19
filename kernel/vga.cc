@@ -97,10 +97,11 @@ uint8_t* VGA::GetFrameBufferSegment() {
 }
 
     
-void VGA::PutPixel(uint32_t x, uint32_t y, uint8_t colorIndex) {
+void VGA::updatePixel(uint32_t x, uint32_t y, uint8_t colorIndex) {
     if(x < 0 || x >= 320 || y < 0 || y >= 200){
         return;
     }
+    //
     uint8_t* pixelAddress = GetFrameBufferSegment() + (((y<<8) + (y<<6)) + x);
     *pixelAddress = colorIndex;
 }
@@ -115,7 +116,7 @@ uint8_t VGA::getColorIndex(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void VGA::PutPixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b) {
-    PutPixel(x,y, getColorIndex(r, g, b));
+    updatePixel(x,y, getColorIndex(r, g, b));
 }
 
 void VGA::FillRectangle(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t r, uint8_t g, uint8_t b)
