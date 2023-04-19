@@ -28,13 +28,20 @@ public:
 
     bool initialize() {
 
-        status = inb(port + 1);
-        status &= ~0x20;
-        status |= 0x10;
-        outb(status, port + 1);
-        outb(0xF4, port);
-        output = readByte();
-        return true;
+        
+        //disables Devices
+        outb(0x64, 0xAD);
+        outb(0x64, 0xA7);
+
+        //flush the output buffer by reading port 0x60 without testing bit 0
+        inb(0x60); n
+
+        //enable the device
+        outb(0x64, 0xAE);
+        outb(0x64, 0xA8);
+
+
+
 
         // outb(0xD4, 0x64);                    // tell the controller to address the mouse
         // outb(0xF3, 0x60);                    // write the mouse command code to the controller's data port
@@ -44,6 +51,17 @@ public:
         // outb(100, 0x60);                     // write the parameter to the controller's data port
         // while(!(inb(0x64) & 1) asm("pause"); // wait until we can read
         // ack = inb(0x60);                     // read back acknowledge. This should be 0xFA
+    }
+
+    int poll(){
+       // To poll, wait until bit 0 of the Status Register becomes set, then read the received byte of data from IO Port 0x60.
+       int byte = inb(0x64);
+        while(!((byte & 0x1) == 1)){
+            byte = inb(0x64);
+        }
+
+        //unsure of this, having it as byte for now. depends how poll is used.
+        return byte;
     }
 
     int readByte() {
