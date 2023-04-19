@@ -17,6 +17,8 @@
 #include "tss.h"
 #include "sys.h"
 #include "process.h"
+#include "vga.h"
+#include "marlon_ps2.h"
 
 struct Stack {
     static constexpr int BYTES = 4096;
@@ -112,6 +114,19 @@ extern "C" void kernelInit(void) {
 
         /* initialize system calls */
         SYS::init();
+
+        /* initialize vga and ps2 */
+        PS2Controller ps2;
+        ps2.initialize();
+        ps2.poll();
+
+        VGA vga;
+        vga.SetMode(320, 200, 8);
+        for(uint8_t y = 0; y < 200; y++) {
+            for(uint8_t x = 0; x < 320; x++) {
+                vga.PutPixel(x, y, 0xFF, 0xFF, 0xFF);
+            }
+        }
 
         /* initialize the thread module */
         threadsInit();
