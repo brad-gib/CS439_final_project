@@ -47,5 +47,14 @@ public:
    
     virtual void FillRectangle(uint32_t x, uint32_t y, uint32_t w, uint32_t h,   uint8_t r, uint8_t g, uint8_t b);
 
+    // void vga_set_cursor_pos(uint8_t x, uint8_t y) {
+    //     // The screen is 80 characters wide...
+    //     uint16_t cursorLocation = (y<<8) + (y<<6) + x;
+    //     outb(0x3D4, 14);
+    //     outb(0x3D5, cursorLocation >> 8);
+    //     outb(0x3D4, 15);
+    //     outb(0x3D5, cursorLocation);
+    // }
+
 
 };

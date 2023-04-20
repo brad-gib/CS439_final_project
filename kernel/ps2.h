@@ -34,7 +34,7 @@ private:
 
 public:
     PS2Controller(VGA* vga) : port(0x60), status(0), output(0), mouse_x(0), mouse_y(0), left_button_active(false),  right_button_active(false),
-        middle_button_active(false), vga(vga), counter(0), size(1) {
+        middle_button_active(false), vga(vga), counter(0), size(10) {
             colors[0][0] = 0x00;
             colors[0][1] = 0x00;
             colors[0][2] = 0x00;
@@ -206,6 +206,8 @@ public:
 
         // Debug::printf("x: %x, y: %x\n", x, y);
 
+        // int prev_mouse_x = mouse_x;
+        // int prev_mouse_y = mouse_y;
 
         if((mouse_x + rel_x < 320) && (mouse_x + rel_x >= 0)){
             mouse_x = mouse_x + rel_x;
@@ -214,6 +216,8 @@ public:
         if((mouse_y - rel_y < 200) && (mouse_y - rel_y >= 0)){
             mouse_y = mouse_y - rel_y;
         }
+
+        // vga->vga_set_cursor_pos((uint8_t)mouse_x, (uint8_t)mouse_y);
 
         // Debug::printf("x: %d, y: %d\n", mouse_x, mouse_y);
 

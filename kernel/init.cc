@@ -176,6 +176,13 @@ extern "C" void kernelInit(void) {
 
     auto mouse_proc = Shared<Process>::make(true);
     thread(mouse_proc,[ps2]{
+        Interrupts::disable();
+        while(true){
+            ps2->update();
+        }
+    });
+    thread(mouse_proc,[ps2]{
+        Interrupts::disable();
         while(true){
             ps2->update();
         }

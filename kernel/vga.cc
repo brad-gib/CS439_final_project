@@ -129,7 +129,7 @@ void VGA::PutPixel(int32_t x, int32_t y,  uint8_t colorIndex)
     || y < 0 || 200 <= y)
         return;
        
-    uint8_t* pixelAddress = GetFrameBufferSegment() + 320*y + x;
+    uint8_t* pixelAddress = GetFrameBufferSegment() + (y<<8) + (y<<6) + x;
     *pixelAddress = colorIndex;
 }
 
