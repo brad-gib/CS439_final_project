@@ -34,12 +34,31 @@ private:
 public:
     PS2Controller(VGA* vga) : port(0x60), status(0), output(0), mouse_x(0), mouse_y(0), left_button_active(false),  right_button_active(false),
         middle_button_active(false), vga(vga), counter(0) {
-            colors = { {0x00, 0x0, 0x00}, // black
-                       {0x00, 0x00, 0xA8}, // blue
-                       {0x00, 0xA8, 0x00}, // green
-                       {0xA8, 0x00, 0x00}, // red
-                       {0xFF, 0xFF, 0xFF}, // white
-                     };
+            colors[0][0] = 0x00;
+            colors[0][1] = 0x00;
+            colors[0][2] = 0x00;
+
+            colors[1][0] = 0x00;
+            colors[1][1] = 0x00;
+            colors[1][2] = 0xA8;
+
+            colors[2][0] = 0x00;
+            colors[2][1] = 0xA8;
+            colors[2][2] = 0x00;
+
+            colors[3][0] = 0xA8;
+            colors[3][1] = 0x00;
+            colors[3][2] = 0x00;
+
+            colors[4][0] = 0xFF;
+            colors[4][1] = 0xFF;
+            colors[4][2] = 0xFF;
+            // colors = { {0x00, 0x00, 0x00}, // black
+            //            {0x00, 0x00, 0xA8}, // blue
+            //            {0x00, 0xA8, 0x00}, // green
+            //            {0xA8, 0x00, 0x00}, // red
+            //            {0xFF, 0xFF, 0xFF}, // white
+            //          };
         }
 
     void initialize() {
