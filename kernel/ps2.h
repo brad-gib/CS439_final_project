@@ -28,12 +28,13 @@ private:
     int colors[5][3];
     VGA* vga;
     int counter;
+    int size;
     friend class VGA;
 
 
 public:
     PS2Controller(VGA* vga) : port(0x60), status(0), output(0), mouse_x(0), mouse_y(0), left_button_active(false),  right_button_active(false),
-        middle_button_active(false), vga(vga), counter(0) {
+        middle_button_active(false), vga(vga), counter(0), size(1) {
             colors[0][0] = 0x00;
             colors[0][1] = 0x00;
             colors[0][2] = 0x00;
@@ -120,27 +121,70 @@ public:
 
     void update() {
         int bytes = poll();
+        int byte1 = bytes & 0xFF;
+        int byte2 = (bytes & 0xFF00) >> 8;
+        int byte3 = (bytes & 0xFF0000) >> 16;
+        int byte4 = (bytes & 0xFF000000) >> 24;
+        // Debug::printf("byte1: %x, byte2: %x, byte3: %x, byte4: %x\n", byte1, byte2, byte3, byte4);
+
+        if(bytes & 0b00001000 && (!(byte1 == byte2 && byte1 == byte3 && byte1 == byte4))){
+            // Debug::printf("mouse input\n");
+            mouseUpdate(bytes);
+        } else{
+            keyboardUpdate(bytes);
+        }
+    }
+
+    void keyboardUpdate(int bytes){
+        // Debug::printf("keyboard input\n");
+        int first_byte = bytes & 0xFF;
+        int byte2 = (bytes & 0xFF00) >> 8;
+        int byte3 = (bytes & 0xFF0000) >> 16;
+        int byte4 = (bytes & 0xFF000000) >> 24;
+        if(!(first_byte == byte2 && first_byte == byte3 && first_byte == byte4)){
+            return;
+        }
+        if(first_byte == 0x39){
+            // Debug::printf("clearing %x\n", bytes);
+            vga->FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
+        } else if(first_byte == 0x2E){
+            counter++;
+            if(counter >= 5) counter = 0;
+        } else if(first_byte == 0x16){
+            //up
+            if(size < 30){
+                size++;
+            }
+        } else if(first_byte == 0x20){
+            //down
+            if(size > 1){
+                size--;
+            }
+        }
+    }
+
+    void mouseUpdate(int bytes){
         if((bytes & 0x1) == 1){
             left_button_active = !left_button_active;
             if(left_button_active){
-                vga->FillRectangle(mouse_x,mouse_y,10,10,colors[counter][0],colors[counter][1],colors[counter][2]);
+                vga->FillRectangle(mouse_x,mouse_y,size,size,colors[counter][0],colors[counter][1],colors[counter][2]);
             } 
-            Debug::printf("left mouse clicked\n\n");
+            // Debug::printf("left mouse clicked\n\n");
         }
 
-        else if(((bytes >>1 ) & 0x1) == 1){
-            right_button_active = !right_button_active;
-            if(right_button_active){
-                vga->FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
-            }
-            Debug::printf("right mouse clicked\n\n");
-        }
-        else if(((bytes >> 2) & 0x1) == 1){
-            middle_button_active = !middle_button_active;
-            counter++;
-            if(counter >= 5) counter = 0;
-            Debug::printf("middle mouse clicked\n\n");
-        }
+        // else if(((bytes >>1 ) & 0x1) == 1){
+        //     right_button_active = !right_button_active;
+        //     if(right_button_active){
+        //         vga->FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
+        //     }
+        //     // Debug::printf("right mouse clicked\n\n");
+        // }
+        // else if(((bytes >> 2) & 0x1) == 1){
+        //     middle_button_active = !middle_button_active;
+        //     counter++;
+        //     if(counter >= 5) counter = 0;
+        //     // Debug::printf("middle mouse clicked\n\n");
+        // }
 
         int state = bytes & 0xFF; // first byte
         int x = (bytes >> 8) & 0xFF; // second byte
@@ -160,20 +204,13 @@ public:
             mouse_y = mouse_y - rel_y;
         }
 
-        Debug::printf("x: %d, y: %d\n", mouse_x, mouse_y);
+        // Debug::printf("x: %d, y: %d\n", mouse_x, mouse_y);
 
-        
-        
-        
         // while(bytes == 0xFA) bytes = inb(port);
         // int buttons = bytes & 0xFF; // left button & 0x1, right button & 0x2, middle button & 
         // int mouse_packet_rel_x = (bytes >> 8) & 0xFF;
         // int mouse_packet_rel_y = (bytes >> 16) & 0xFF;
         // mouse_x = mouse_x + mouse_packet_rel_x;
         // mouse_y = mouse_y + mouse_packet_rel_y;
-
-
-
-
     }
 };
