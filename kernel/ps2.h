@@ -12,7 +12,7 @@
 #include "heap.h"
 #include "shared.h"
 #include "kernel.h"
-
+#include "vga.h"
 
 class PS2Controller {
 
@@ -25,12 +25,16 @@ private:
     bool left_button_active;
     bool right_button_active;
     bool middle_button_active;
-
+    //int colors[][];
+    VGA* vga;
     friend class VGA;
 
+
 public:
-    PS2Controller() : port(0x60), status(0), output(0), mouse_x(0), mouse_y(0), left_button_active(false),  right_button_active(false),
-        middle_button_active(false) {}
+    PS2Controller(VGA* vga) : port(0x60), status(0), output(0), mouse_x(0), mouse_y(0), left_button_active(false),  right_button_active(false),
+        middle_button_active(false), vga(vga) {
+            //colors = new int[3][3];
+        }
 
     void initialize() {
 
@@ -61,15 +65,15 @@ public:
 
     int poll(){
        // To poll, wait until bit 0 of the Status Register becomes set, then read the received byte of data from IO Port 0x60.
-       Debug::printf("in poll\n");
+    //    Debug::printf("in poll\n");
        int byte = inb(0x64);
         while(!((byte & 0x1) == 1)){
             byte = inb(0x64);
         }
 
         //unsure of this, having it as byte for now. depends how poll is used.
-        Debug::printf("poll works\n");
-        return inb(0x60);
+        // Debug::printf("poll works\n");
+        return inl(0x60);
     }
 
     // int readByte() {
@@ -103,24 +107,34 @@ public:
         else if(((bytes >> 2) & 0x1) == 1){
             middle_button_active = !middle_button_active;
             Debug::printf("middle mouse clicked\n\n");
-        }else{}
+        }
 
-        int state = bytes & 0xFF;
-        int8_t x = poll();
-        int8_t rel_x = x -((state << 4) & 0x100);
-        int8_t y = poll();
-        int8_t rel_y = y - ((state << 3) & 0x100);
+        int state = bytes & 0xFF; // first byte
+        int x = (bytes >> 8) & 0xFF; // second byte
+        int32_t rel_x = x -((state << 4) & 0x100);
+        int y = (bytes >> 16) & 0xFF; // third byte
+        int32_t rel_y = y - ((state << 3) & 0x100);
 
-        mouse_x = mouse_x + rel_x;
-        mouse_y = mouse_y + rel_y;
 
-        // mouse_x = mouse_x + x;
-        // mouse_y = mouse_y + y;
+        // Debug::printf("x: %x, y: %x\n", x, y);
 
-        Debug::printf("x coord: %d\n", mouse_x);
-        Debug::printf("y coord: %d\n", mouse_y);
+
+        if((mouse_x + rel_x < 320) && (mouse_x + rel_x >= 0)){
+            mouse_x = mouse_x + rel_x;
+        }
+       
+        if((mouse_y - rel_y < 200) && (mouse_y - rel_y >= 0)){
+            mouse_y = mouse_y - rel_y;
+        }
+
+        Debug::printf("x: %d, y: %d\n", mouse_x, mouse_y);
+
         
-        
+        if(left_button_active){
+            vga->FillRectangle(mouse_x,mouse_y,4,4,0x00,0x00,0x00);
+        } else if(right_button_active){
+            vga->FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
+        }
         
         // while(bytes == 0xFA) bytes = inb(port);
         // int buttons = bytes & 0xFF; // left button & 0x1, right button & 0x2, middle button & 

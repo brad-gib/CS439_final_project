@@ -17,7 +17,8 @@
 #include "tss.h"
 #include "sys.h"
 #include "process.h"
-#include "vga.h"
+// #include "vga.h"
+#include "ps2.h"
 
 struct Stack {
     static constexpr int BYTES = 4096;
@@ -114,15 +115,6 @@ extern "C" void kernelInit(void) {
         /* initialize system calls */
         SYS::init();
 
-        /* initialize vga and ps2 */
-        PS2Controller ps2;
-        ps2.initialize();
-        ps2.poll();
-
-        VGA vga;
-        vga.SetMode(320, 200, 8);
-        vga.FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
-
         /* initialize the thread module */
         threadsInit();
 
@@ -172,6 +164,24 @@ extern "C" void kernelInit(void) {
     if (myOrder == kConfig.totalProcs) {
         auto initProc = Shared<Process>::make(true);
         thread(initProc,[] {
+
+            VGA* vga = new VGA();
+            vga->SetMode(320, 200, 8);
+            vga->FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
+
+            /* initialize vga and ps2 */
+            PS2Controller* ps2 = new PS2Controller(vga);
+            ps2->initialize();
+            ps2->poll();
+
+    auto mouse_proc = Shared<Process>::make(true);
+    thread(mouse_proc,[ps2]{
+        while(true){
+            ps2->update();
+        }
+    });
+
+
             kernelMain();
             Debug::shutdown();
         });
