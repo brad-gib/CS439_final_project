@@ -181,14 +181,7 @@ extern "C" void kernelInit(void) {
             ps2->update();
         }
     });
-    thread(mouse_proc,[ps2]{
-        Interrupts::disable();
-        while(true){
-            ps2->update();
-        }
-    });
-
-
+    
             kernelMain();
             Debug::shutdown();
         });

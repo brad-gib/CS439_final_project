@@ -29,12 +29,13 @@ private:
     VGA* vga;
     int counter;
     int size;
+    uint8_t prev_color;
     friend class VGA;
 
 
 public:
     PS2Controller(VGA* vga) : port(0x60), status(0), output(0), mouse_x(0), mouse_y(0), left_button_active(false),  right_button_active(false),
-        middle_button_active(false), vga(vga), counter(0), size(10) {
+        middle_button_active(false), vga(vga), counter(0), size(10), prev_color(0x3F) {
             colors[0][0] = 0x00;
             colors[0][1] = 0x00;
             colors[0][2] = 0x00;
@@ -90,9 +91,9 @@ public:
     }
 
     int poll(){
-       // To poll, wait until bit 0 of the Status Register becomes set, then read the received byte of data from IO Port 0x60.
-    //    Debug::printf("in poll\n");
-       int byte = inb(0x64);
+        // To poll, wait until bit 0 of the Status Register becomes set, then read the received byte of data from IO Port 0x60.
+        //    Debug::printf("in poll\n");
+        int byte = inb(0x64);
         while(!((byte & 0x1) == 1)){
             byte = inb(0x64);
         }
@@ -101,23 +102,6 @@ public:
         // Debug::printf("poll works\n");
         return inl(0x60);
     }
-
-    // int readByte() {
-    //     unsigned char byte;
-    //     // while ((inb(port + 1) & 1) == 0) {
-    //     //     std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    //     // }
-    //     byte = inb(port);
-    //     if (byte == 0xFA) {
-    //         return -1; // ACK
-    //     } else if (byte == 0xFE) {
-    //         return -2; // RESEND
-    //     } else if (byte == 0xEE) {
-    //         return -3; // ERROR
-    //     } else {
-    //         return byte;
-    //     }
-    // }
 
     void update() {
         int bytes = poll();
@@ -183,6 +167,7 @@ public:
             // Debug::printf("left mouse clicked\n\n");
         }
 
+
         // else if(((bytes >>1 ) & 0x1) == 1){
         //     right_button_active = !right_button_active;
         //     if(right_button_active){
@@ -208,6 +193,8 @@ public:
 
         // int prev_mouse_x = mouse_x;
         // int prev_mouse_y = mouse_y;
+        uint8_t* pixelAddress = vga->GetFrameBufferSegment() + (mouse_y<<8) + (mouse_y<<6) + mouse_x; // dereference for color
+        *pixelAddress = prev_color;
 
         if((mouse_x + rel_x < 320) && (mouse_x + rel_x >= 0)){
             mouse_x = mouse_x + rel_x;
@@ -216,16 +203,12 @@ public:
         if((mouse_y - rel_y < 200) && (mouse_y - rel_y >= 0)){
             mouse_y = mouse_y - rel_y;
         }
+        pixelAddress = vga->GetFrameBufferSegment() + (mouse_y<<8) + (mouse_y<<6) + mouse_x; // dereference for color
+        prev_color = *pixelAddress;
+        *pixelAddress = 0x62; // yellow
 
         // vga->vga_set_cursor_pos((uint8_t)mouse_x, (uint8_t)mouse_y);
 
         // Debug::printf("x: %d, y: %d\n", mouse_x, mouse_y);
-
-        // while(bytes == 0xFA) bytes = inb(port);
-        // int buttons = bytes & 0xFF; // left button & 0x1, right button & 0x2, middle button & 
-        // int mouse_packet_rel_x = (bytes >> 8) & 0xFF;
-        // int mouse_packet_rel_y = (bytes >> 16) & 0xFF;
-        // mouse_x = mouse_x + mouse_packet_rel_x;
-        // mouse_y = mouse_y + mouse_packet_rel_y;
     }
 };
