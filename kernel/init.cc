@@ -18,7 +18,6 @@
 #include "sys.h"
 #include "process.h"
 #include "vga.h"
-#include "marlon_ps2.h"
 
 struct Stack {
     static constexpr int BYTES = 4096;
@@ -166,6 +165,7 @@ extern "C" void kernelInit(void) {
     ltr(tssDescriptorBase + id * 8);
 
     Debug::printf("| %d enabling interrupts, I'm scared\n",id);
+
     sti();
 
     auto myOrder = howManyAreHere.add_fetch(1);

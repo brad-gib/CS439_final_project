@@ -13,6 +13,7 @@
 #include "kernel.h"
 #include "stdint.h"
 #include "port.h"
+#include "ps2.h"
 
 
 class VGA
