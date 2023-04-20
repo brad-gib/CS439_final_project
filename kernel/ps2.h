@@ -145,20 +145,31 @@ public:
             return;
         }
         if(first_byte == 0x39){
+            //space bar pressed
             // Debug::printf("clearing %x\n", bytes);
             vga->FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
         } else if(first_byte == 0x2E){
+            //'c' pressed
             counter++;
             if(counter >= 5) counter = 0;
         } else if(first_byte == 0x16){
-            //up
+            //'u' pressed
             if(size < 30){
                 size++;
             }
         } else if(first_byte == 0x20){
-            //down
+            //'d' pressed
             if(size > 1){
                 size--;
+            }
+        } else if(first_byte == 0x21){
+            //'f' pressed
+            vga->FillRectangle(0,0,320,200,colors[counter][0],colors[counter][1],colors[counter][2]);
+        } else if(first_byte == 0x02){
+            //'1' pressed
+            for(int i = 0; i < 15; i ++){
+                int index = i%5;
+                vga->FillRectangle(0,0,320,200,colors[index][0],colors[index][1],colors[index][2]);
             }
         }
     }
