@@ -122,11 +122,17 @@ public:
         int bytes = poll();
         if((bytes & 0x1) == 1){
             left_button_active = !left_button_active;
+            if(left_button_active){
+                vga->FillRectangle(mouse_x,mouse_y,10,10,colors[counter][0],colors[counter][1],colors[counter][2]);
+            } 
             Debug::printf("left mouse clicked\n\n");
         }
 
         else if(((bytes >>1 ) & 0x1) == 1){
             right_button_active = !right_button_active;
+            if(right_button_active){
+                vga->FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
+            }
             Debug::printf("right mouse clicked\n\n");
         }
         else if(((bytes >> 2) & 0x1) == 1){
@@ -157,11 +163,7 @@ public:
         Debug::printf("x: %d, y: %d\n", mouse_x, mouse_y);
 
         
-        if(left_button_active){
-            vga->FillRectangle(mouse_x,mouse_y,4,4,colors[counter][0],colors[counter][1],colors[counter][2]);
-        } else if(right_button_active){
-            vga->FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
-        }
+        
         
         // while(bytes == 0xFA) bytes = inb(port);
         // int buttons = bytes & 0xFF; // left button & 0x1, right button & 0x2, middle button & 
