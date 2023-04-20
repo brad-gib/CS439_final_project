@@ -25,16 +25,20 @@ private:
     bool left_button_active;
     bool right_button_active;
     bool middle_button_active;
-    //int colors[][];
+    int colors[][] = { {0x00, 0x0, 0x00}, // black
+                       {0x00, 0x00, 0xA8}, // blue
+                       {0x00, 0xA8, 0x00}, // green
+                       {0xA8, 0x00, 0x00}, // red
+                       {0xFF, 0xFF, 0xFF}, // white
+                     };
     VGA* vga;
+    int counter;
     friend class VGA;
 
 
 public:
     PS2Controller(VGA* vga) : port(0x60), status(0), output(0), mouse_x(0), mouse_y(0), left_button_active(false),  right_button_active(false),
-        middle_button_active(false), vga(vga) {
-            //colors = new int[3][3];
-        }
+        middle_button_active(false), vga(vga), cuonter(0) {}
 
     void initialize() {
 
@@ -106,6 +110,8 @@ public:
         }
         else if(((bytes >> 2) & 0x1) == 1){
             middle_button_active = !middle_button_active;
+            counter++;
+            if(counter >= 5) counter = 0;
             Debug::printf("middle mouse clicked\n\n");
         }
 
@@ -131,7 +137,7 @@ public:
 
         
         if(left_button_active){
-            vga->FillRectangle(mouse_x,mouse_y,4,4,0x00,0x00,0x00);
+            vga->FillRectangle(mouse_x,mouse_y,4,4,colors[counter][0],colors[counter][1],colors[counter][2]);
         } else if(right_button_active){
             vga->FillRectangle(0,0,320,200,0xFF,0xFF,0xFF);
         }
