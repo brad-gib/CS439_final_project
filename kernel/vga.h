@@ -15,6 +15,7 @@
 #include "port.h"
 
 
+//Brad and Tai worked on this
 class VGA
 {
 protected:
